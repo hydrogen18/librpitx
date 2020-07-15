@@ -65,9 +65,8 @@ dmagpio::dmagpio() : gpio(GetPeripheralBase() + DMA_BASE, DMA_LEN)
 }
 
 // ***************** CLK Registers *****************************************
-clkgpio::clkgpio() : gpio(GetPeripheralBase() + CLK_BASE, CLK_LEN)
+clkgpio::clkgpio() : gpio(GetPeripheralBase() + CLK_BASE, CLK_LEN), clk_ppm(0)
 {
-	SetppmFromNTP();
 	padgpio level;
 	level.setlevel(7); //MAX Power 
 }
@@ -102,7 +101,6 @@ int clkgpio::SetPllNumber(int PllNo, int MashType)
 uint64_t clkgpio::GetPllFrequency(int PllNo)
 {
 	uint64_t Freq = 0;
-	SetppmFromNTP();
 	switch (PllNo)
 	{
 	case clk_osc:
@@ -590,7 +588,7 @@ void clkgpio::disableclk(int gpio)
 
 void clkgpio::Setppm(double ppm)
 {
-	clk_ppm = ppm ; // -2 is empiric : FixMe
+	clk_ppm = ppm ; 
 }
 
 void clkgpio::SetppmFromNTP()
@@ -604,18 +602,15 @@ void clkgpio::SetppmFromNTP()
 	status = ntp_adjtime(&ntx);
 	double ntp_ppm;
 
-	if (status != TIME_OK)
-	{
+	if (status != TIME_OK) {
 		dbg_printf(1, "Warning: NTP calibrate failed\n");
-	}
-	else
-	{
-
+	} else {
 		ntp_ppm = (double)ntx.freq / (double)(1 << 16);
 		dbg_printf(1, "Info:NTP find offset %ld freq %ld pps=%ld ppm=%f\n", ntx.offset,ntx.freq,ntx.ppsfreq,ntp_ppm);
 		
-		if (fabs(ntp_ppm) < 200)
-			Setppm(ntp_ppm/*+0.70*/); //0.7 is empiric 
+		if (fabs(ntp_ppm) < 200) {
+			Setppm(ntp_ppm); 
+    }
 			
 	}
 }

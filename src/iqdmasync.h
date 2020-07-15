@@ -22,7 +22,7 @@ class iqdmasync:public bufferdma,public clkgpio,public pwmgpio,public pcmgpio
 	uint32_t SampleRate;
 	public:
 	
-	iqdmasync(uint64_t TuneFrequency,uint32_t SR,int Channel,uint32_t FifoSize,int Mode);
+	iqdmasync(uint64_t TuneFrequency,uint32_t SR,int Channel,uint32_t FifoSize,int Mode, float * ppm);
 	~iqdmasync();
 	void SetDmaAlgo();
 	

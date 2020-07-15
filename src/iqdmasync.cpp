@@ -23,7 +23,7 @@ This program is free software: you can redistribute it and/or modify
 #include <sched.h>
 #include "util.h"
 
-iqdmasync::iqdmasync(uint64_t TuneFrequency,uint32_t SR,int Channel,uint32_t FifoSize,int Mode):bufferdma(Channel,FifoSize,4,3)
+iqdmasync::iqdmasync(uint64_t TuneFrequency,uint32_t SR,int Channel,uint32_t FifoSize,int Mode, float * ppm):bufferdma(Channel,FifoSize,4,3)
 {
 // Usermem :
 // FRAC frequency
@@ -33,6 +33,11 @@ iqdmasync::iqdmasync(uint64_t TuneFrequency,uint32_t SR,int Channel,uint32_t Fif
 	SampleRate=SR;
 	tunefreq=TuneFrequency;
 	clkgpio::SetAdvancedPllMode(true);
+  if (NULL != ppm) {
+		clkgpio::Setppm(*ppm);
+  } else {
+    clkgpio::SetppmFromNTP();
+  }
 	clkgpio::SetCenterFrequency(TuneFrequency,SampleRate); // Write Mult Int and Frac : FixMe carrier is already there
 	clkgpio::SetFrequency(0);
 	clkgpio::enableclk(4);
